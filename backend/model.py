@@ -45,7 +45,6 @@ class ThompsonSampling:
 
         self.seen.add(seen_song)
 
-feedback = {}
 
 def compute_centroid(context_df, feedback):
     if not feedback:
@@ -62,12 +61,10 @@ def compute_centroid(context_df, feedback):
     
     return numerator / denominator if denominator > 0 else None
     
-# data frame
-df = pd.read_csv('featuresV2.csv')
-context_df = df.drop(columns = df.columns[[0, 8, 9, 10, 11, 12]])
+
 
 # ANNOY
-def buildAnnoy():
+def buildAnnoy(context_df):
 
     t = AnnoyIndex(7, 'angular')
     for i in range(len(context_df.to_numpy())):
@@ -78,9 +75,6 @@ def buildAnnoy():
     u = t
 
     return u
-
-
-agent = ThompsonSampling(7)
 
 
 for i in range(1000):

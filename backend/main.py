@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+import main
 # REQUIREMENTS:
 # take in user response (like, dislike)
 # upload csv and mp3 files
@@ -8,13 +9,17 @@ from fastapi import FastAPI
 # 
 app = FastAPI()
 
-@app.get('/')
-async def root():
-    return {'message': 'tyshi'}
 
-@app.post('/import_csv')
-async def user_feedback():
+feedback = {}
 
+
+# data frame
+# df = pd.read_csv('featuresV2.csv')
+context_df = df.drop(columns = df.columns[[0, 8, 9, 10, 11, 12]])
+
+annoy_index = main.build_annoy(context_df)
+
+agent = main.ThompsonSampling(7)
 
 @app.on_event('startup')
 async def load_cache():
