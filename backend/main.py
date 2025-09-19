@@ -1,26 +1,45 @@
 from fastapi import FastAPI
 import main
-# REQUIREMENTS:
-# take in user response (like, dislike)
-# upload csv and mp3 files
-# load mp3 file to listen to
-# load other metadata
-#  compute centroid
-# 
+import db
+import pandas as pd
+from contextlib import asynccontextmanager
+
+agent = ''
+retreival = ''
 app = FastAPI()
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    connect = db.connection()
+    cur = connect.cursor()
 
-feedback = {}
+    df = pd.DataFrame(db.get_all())
+    context_df = df.drop(columns = df.columns[[0, 8, 9, 10, 11, 12]])
+    
+
+    agent = main.ThompsonSampling(7)
+    retreival = main.Retreival(context_df)
+
+    yield
+
+app.get('/get_audio')
+async def get_audio(song_index: int):
+    # load mp3 file to listen to
 
 
-# data frame
-# df = pd.read_csv('featuresV2.csv')
-context_df = df.drop(columns = df.columns[[0, 8, 9, 10, 11, 12]])
 
-annoy_index = main.build_annoy(context_df)
 
-agent = main.ThompsonSampling(7)
+    
 
-@app.on_event('startup')
-async def load_cache():
+
+    
+
+    
+
+
+    
+    
+
+
+
     

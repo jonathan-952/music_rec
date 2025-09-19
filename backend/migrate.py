@@ -1,22 +1,10 @@
-import psycopg2
 import csv
 import os
 from dotenv import load_dotenv
+import db
 
-load_dotenv()
-
-username = os.getenv("DB_USERNAME")
-pwd = os.getenv("DB_PASSWORD")
-
-connection = psycopg2.connect(
-    host = "localhost",
-    database = "postgres",
-    port=15432, 
-    user = username,
-    password = pwd
-)
-
-cur = connection.cursor()
+connect = db.connection()
+cur = connect.cursor()
 
 # create table in db
 cur.execute("""
@@ -48,6 +36,6 @@ with open("../testing/featuresV2.csv", "r", encoding="utf-8") as f:
         f
     )
 
-connection.commit()
+connect.commit()
 cur.close()
-connection.close()
+connect.close()
