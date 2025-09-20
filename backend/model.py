@@ -54,7 +54,7 @@ class Retreival:
     
     async def start_annoy(self, context_df):
         t = AnnoyIndex(7, 'angular')
-        for i in range(len(context_df.to_numpy())):
+        for i in range(len(self.context_df.to_numpy())):
             v = context_df.iloc[i]
             t.add_item(i, v)
 
@@ -63,7 +63,7 @@ class Retreival:
 
         return u
 
-    def compute_centroid(self, context_df, feedback):
+    def compute_centroid(self, feedback):
         if not feedback:
             return None  # no feedback yet
         
@@ -71,7 +71,7 @@ class Retreival:
         weights = np.array(list(feedback.values()))
         
         mask = weights != 0  # ignore skips
-        embeddings = context_df.iloc[indices].to_numpy()
+        embeddings = self.context_df.iloc[indices].to_numpy()
         
         numerator = np.sum(weights[mask, None] * embeddings[mask], axis=0)
         denominator = np.sum(np.abs(weights[mask]))

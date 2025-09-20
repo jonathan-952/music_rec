@@ -26,6 +26,15 @@ app.get('/get_audio')
 async def get_audio(song_index: int):
     # load mp3 file to listen to
 
+app.get('/recommend_song')
+async def recommend():
+    # this should return the index of mp3 file, fetch from db and play on frontend
+    mp3_index = retreival.recommendation()
+    
+    
+
+
+
 
 
 
