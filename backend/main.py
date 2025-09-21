@@ -15,10 +15,12 @@ async def lifespan(app: FastAPI):
 
     df = pd.DataFrame(db.get_all())
     context_df = df.drop(columns = df.columns[[0, 8, 9, 10, 11, 12]])
+
+    mp3_files = db.get_mp3()
     
 
     agent = main.ThompsonSampling(7)
-    retreival = main.Retreival(context_df)
+    retreival = main.Retreival(df, context_df, mp3_files)
 
     yield
 

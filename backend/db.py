@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 from annoy import AnnoyIndex
 import numpy as np
 import pandas as pd
+import glob
+import kagglehub
 
 
 def connection():
@@ -31,4 +33,15 @@ def get_all(cur):
     return data
     
     return df
+
+def get_mp3():
+    path = ""
+    try:
+        path = kagglehub.dataset_download("noahbadoa/fma-dataset-100k-music-wav-files")
+    except Exception as e:
+        print("Error:", e)
+
+    target_path = path + r'\fma_large'
+    files = glob.glob(path + r'\**\*.mp3', recursive = True)
+    return files
 

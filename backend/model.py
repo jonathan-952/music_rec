@@ -47,10 +47,12 @@ class ThompsonSampling:
 
 
 class Retreival:
-    def __init__(self, context_df):
+    def __init__(self, metadata, context_df, mp3_files):
         self.context_df = context_df
+        self.metadata = metadata
         self.annoy = self.start_annoy()
         self.feedback = {}
+        self.mp3_files = mp3_files
     
     async def start_annoy(self, context_df):
         t = AnnoyIndex(7, 'angular')
@@ -89,19 +91,21 @@ class Retreival:
 
         candidates = self.context_df.iloc[annoy_indices]
         # full metadata df
-        df_2 = df.iloc[annoy_indices]
+        df_2 = self.metadata.iloc[annoy_indices]
         # map indices to embeddings in context df
         rec_song_index = agent.select_arm(candidates.to_numpy(), annoy_indices)
 
         
         global_index = annoy_indices[rec_song_index]
-        audio_file_index = df.iloc[global_index, 12]
+        audio_file_index = self.metadata.iloc[global_index, 12]
 
         # NEED TO STORE MP3 FILES, FIX THIS!!!
-        rec_vector = files[audio_file_index]
+        rec_vector = self.mp3_files[audio_file_index]
         
-        y, sr = librosa.load(rec_vector, sr=22050)
-        display(ipt.Audio(data=y, rate=sr))
+        # y, sr = librosa.load(rec_vector, sr=22050)
+        # display(ipt.Audio(data=y, rate=sr))
+
+        return
         
         # take in input from user on frontend here
         # reward = int(input('Like: 1, Dislike: -1 ;'))
