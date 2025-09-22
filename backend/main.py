@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-import main
+import model
 import db
 import pandas as pd
 from contextlib import asynccontextmanager
@@ -19,8 +19,8 @@ async def lifespan(app: FastAPI):
     mp3_files = db.get_mp3()
     
 
-    agent = main.ThompsonSampling(7)
-    retreival = main.Retreival(df, context_df, mp3_files)
+    agent = model.ThompsonSampling(7)
+    retreival = model.Retreival(df, context_df, mp3_files)
 
     yield
 
