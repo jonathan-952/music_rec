@@ -1,4 +1,5 @@
 .env
 kaggle
 testing/data
-/venv
+venv
+__pycache__/

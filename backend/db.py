@@ -1,7 +1,7 @@
 import psycopg2
 import os
 from dotenv import load_dotenv
-from annoy import AnnoyIndex
+# from annoy import AnnoyIndex
 import numpy as np
 import pandas as pd
 import glob

@@ -2,7 +2,10 @@ import csv
 import os
 from dotenv import load_dotenv
 import db
-import boto3
+from huggingface_hub import login
+import kagglehub
+from datasets import load_dataset, DatasetDict
+
 
 
 def upload_csv():
@@ -44,22 +47,26 @@ def upload_csv():
     connect.close()
 
 
-# def upload_mp3_files():
-#     path = ""
-#     try:
-#         path = kagglehub.dataset_download("noahbadoa/fma-dataset-100k-music-wav-files")
-#     except Exception as e:
-#         print("Error:", e)
+def upload_mp3_files():
+    load_dotenv()
 
-#     target_path = path + r'\fma_large'
-#     files = glob.glob(path + r'\**\*.mp3', recursive = True)
+    path = ""
+    try:
+        path = kagglehub.dataset_download("noahbadoa/fma-dataset-100k-music-wav-files")
+    except Exception as e:
+        print("Error:", e)
 
-#     obj = boto3.client("s3")
-#     for i in range(len(files)):
+    target_path = os.path.join(path, "fma_large")
+    # files = glob.glob(path + r'\**\*.mp3', recursive = True)
+    try: 
+        dataset = load_dataset("audiofolder", data_dir=target_path)
+        login(token=os.getenv("HF_TOKEN"))
+        dataset.push_to_hub("johnpork12345/music")
+    except Exception as e:
+        print(e)
+    finally:
+        print('successful')
+    
+upload_mp3_files()
 
-#         obj.upload_file(
-#             Filename= files[i],
-#             Bucket="songrecaudio",
-#             Key= f"{i}"
-#         )
 
