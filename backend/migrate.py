@@ -60,11 +60,13 @@ def upload_mp3_files():
     # files = glob.glob(path + r'\**\*.mp3', recursive = True)
     try: 
         dataset = load_dataset("audiofolder", data_dir=target_path)
+
+        dataset_small = dataset["train"].select(range(100))
         login(token=os.getenv("HF_TOKEN"))
-        dataset.push_to_hub("johnpork12345/music")
+        dataset_small.push_to_hub("johnpork12345/music")
     except Exception as e:
         print(e)
-    finally:
+    else:
         print('successful')
     
 upload_mp3_files()

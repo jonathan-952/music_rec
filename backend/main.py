@@ -27,6 +27,7 @@ async def lifespan(app: FastAPI):
 app.get('/get_audio')
 async def get_audio(song_index: int):
     # load mp3 file to listen to
+    #  HF API request
 
 app.get('/recommend_song')
 async def recommend():

@@ -99,21 +99,18 @@ class Retreival:
         global_index = annoy_indices[rec_song_index]
         audio_file_index = self.metadata.iloc[global_index, 12]
 
-        # NEED TO STORE MP3 FILES, FIX THIS!!!
+        # call HF API
         rec_vector = self.mp3_files[audio_file_index]
-        
-        # y, sr = librosa.load(rec_vector, sr=22050)
-        # display(ipt.Audio(data=y, rate=sr))
 
-        return
+        # send mp3 file as response, along with global index to store on fe before sending back to be to update
+
         
-        # take in input from user on frontend here
-        # reward = int(input('Like: 1, Dislike: -1 ;'))
-    
-        self.feedback[global_index] = reward
+    # logic to get feedback from user and update
+    def handle_update(self, index, reward, agent):
+        self.feedback[index] = reward
         
-        context_vector = self.context_df.iloc[global_index].to_numpy()
+        context_vector = self.context_df.iloc[index].to_numpy()
         
-        agent.update(context_vector, reward, global_index)
+        agent.update(context_vector, reward, index)
         
     
