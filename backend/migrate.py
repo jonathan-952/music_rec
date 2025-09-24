@@ -5,6 +5,7 @@ import db
 from huggingface_hub import login
 import kagglehub
 from datasets import load_dataset, DatasetDict
+import glob, shutil
 
 
 
@@ -56,7 +57,16 @@ def upload_mp3_files():
     except Exception as e:
         print("Error:", e)
 
+  
     target_path = os.path.join(path, "fma_large")
+
+    all_mp3s = glob.glob(os.path.join(target_path, "**", "*.mp3"), recursive=True)
+    flat_dir = os.path.join(path, "flat_mp3s")
+    os.makedirs(flat_dir, exist_ok=True)
+
+    for mp3 in all_mp3s:
+        shutil.copy(mp3, flat_dir) 
+
     # files = glob.glob(path + r'\**\*.mp3', recursive = True)
     try: 
         dataset = load_dataset("audiofolder", data_dir=target_path)
