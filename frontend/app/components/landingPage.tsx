@@ -5,6 +5,7 @@ import { Heart } from "lucide-react"
 import { AudioPlayer } from "@/components/audioPlayer"
 import { Sidebar } from "@/components/likedSongs"
 import axios from "axios"
+import { useEffect } from "react"
 const sampleSongs = [
   {
     id: 1,
@@ -33,18 +34,39 @@ const sampleSongs = [
 ]
 
 export default function LandingPage() {
-  const [currentSongIndex, setCurrentSongIndex] = useState(0)
+  const [song, setSong] = useState(null);
   const [likedSongs, setLikedSongs] = useState([])
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
-  const currentSong = sampleSongs[currentSongIndex]
+
+   useEffect(() => {
+    const fetchSong = async () => {
+      try {
+        const res = await axios.get("http://localhost:8000/recommend-song");
+        setSong(res.data); // backend returns payload (metadata, index, etc)
+      } catch (err) {
+        console.error("Error fetching song:", err);
+      }
+    };
+
+      fetchSong()
+    }, []);
 
   const handleSkip = () => {
-    setCurrentSongIndex((prev) => (prev + 1) % sampleSongs.length)
   }
 
   const handleLike = () => {
-    setLikedSongs((prev) => [...prev, currentSong])
+  }
+
+  const handleFeedback = async (rating) => {
+      try {
+      await axios.post(`http://localhost:8000/feedback`, {
+        rating: rating, 
+        song: song.index,
+      });
+    } catch (err) {
+      console.error("Error submitting rating:", err);
+    }
   }
 
   return (
@@ -60,7 +82,7 @@ export default function LandingPage() {
 
       <div className="flex-1 flex items-center justify-center px-6">
         <div className="w-full max-w-md space-y-6">
-          <AudioPlayer song={currentSong} onSkip={handleSkip} />
+          <AudioPlayer song={song.} onSkip={handleSkip} onRate={handleFeedback}/>
           <div className="flex justify-center">
             <button
               onClick={handleLike}
