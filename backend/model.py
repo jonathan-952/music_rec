@@ -5,6 +5,7 @@ import glob
 import IPython.display as ipt
 import librosa
 from annoy import AnnoyIndex
+import db
 
 
 class ThompsonSampling:
@@ -52,7 +53,7 @@ class Retreival:
         self.metadata = metadata
         self.annoy = self.start_annoy()
         self.feedback = {}
-        self.mp3_files = mp3_files
+        self.mp3_files = db.get_mp3()
     
     async def start_annoy(self, context_df):
         t = AnnoyIndex(7, 'angular')
@@ -98,9 +99,13 @@ class Retreival:
         
         global_index = annoy_indices[rec_song_index]
         audio_file_index = self.metadata.iloc[global_index, 12]
+        title = self.metadata.iloc[global_index, 'title']
+        artist = self.metadata.iloc[global_index, 'artist']
+        # call HF API eventually
+        rec_audio = self.mp3_files[audio_file_index]
 
-        # call HF API
-        rec_vector = self.mp3_files[audio_file_index]
+        return {'index': global_index, 'audio': rec_audio, 'artist': artist, 'title': title}
+        
 
         # send mp3 file as response, along with global index to store on fe before sending back to be to update
 

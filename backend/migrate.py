@@ -72,6 +72,7 @@ def upload_mp3_files():
         dataset = load_dataset("audiofolder", data_dir=target_path)
 
         dataset_small = dataset["train"].select(range(100))
+        print(len(dataset_small))
         login(token=os.getenv("HF_TOKEN"))
         dataset_small.push_to_hub("johnpork12345/music")
     except Exception as e:

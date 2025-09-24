@@ -24,15 +24,19 @@ async def lifespan(app: FastAPI):
 
     yield
 
-app.get('/get_audio')
+app.get('/get-audio')
 async def get_audio(song_index: int):
     # load mp3 file to listen to
     #  HF API request
 
-app.get('/recommend_song')
+app.get('/recommend-song')
 async def recommend():
     # this should return the index of mp3 file, fetch from db and play on frontend
-    mp3_index = retreival.recommendation()
+    song = retreival.recommendation()
+
+app.post('/feedback')
+async def feedback(index, rating):
+    retreival.handle_update(index, rating, agent)
     
     
 
