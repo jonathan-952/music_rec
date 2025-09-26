@@ -37,6 +37,9 @@ async def recommend():
 app.post('/feedback')
 async def feedback(index, rating):
     retreival.handle_update(index, rating, agent)
+
+app.get('/liked-songs')
+async def 
     
     
 
