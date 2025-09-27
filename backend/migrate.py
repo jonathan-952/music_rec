@@ -79,7 +79,6 @@ def upload_mp3_files():
         print(e)
     else:
         print('successful')
-    
-upload_mp3_files()
+
 
 
