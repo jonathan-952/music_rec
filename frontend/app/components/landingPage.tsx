@@ -18,7 +18,7 @@ export default function LandingPage() {
     const fetchSong = async () => {
       try {
         const res = await axios.get("http://localhost:8000/recommend-song");
-        const liked = await axios.get("http://localhost:8000/recommend-song");
+        const liked = await axios.get("http://localhost:8000/liked-songs");
         setSong(res.data); // backend returns payload (metadata, index, etc)
         
       } catch (err) {

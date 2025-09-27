@@ -8,6 +8,7 @@ from annoy import AnnoyIndex
 import db
 
 
+
 class ThompsonSampling:
     def __init__(self, features):
         self.features = features
@@ -81,7 +82,7 @@ class Retreival:
         
         return numerator / denominator if denominator > 0 else None
 
-    def recommendation(self, agent):
+    def recommendation(self, agent, sp):
         centroid = self.compute_centroid(self.context_df, self.feedback)
 
         if centroid is None:
@@ -98,17 +99,15 @@ class Retreival:
 
         
         global_index = annoy_indices[rec_song_index]
-        audio_file_index = self.metadata.iloc[global_index, 12]
+        # audio_file_index = self.metadata.iloc[global_index, 12]
         title = self.metadata.iloc[global_index, 'title']
         artist = self.metadata.iloc[global_index, 'artist']
-        # call HF API eventually
-        rec_audio = self.mp3_files[audio_file_index]
+ 
+        query = f"{title} {artist}"
+        rec_audio = self.get_audio(query, sp)
 
         return {'index': global_index, 'audio': rec_audio, 'artist': artist, 'title': title}
         
-
-        # send mp3 file as response, along with global index to store on fe before sending back to be to update
-
         
     # logic to get feedback from user and update
     def handle_update(self, index, reward, agent):
@@ -117,5 +116,10 @@ class Retreival:
         context_vector = self.context_df.iloc[index].to_numpy()
         
         agent.update(context_vector, reward, index)
+    
+    def get_audio(self, query, sp):
+        res = sp.search(q=query, type="track", limit=1)
+        return res["tracks"]["items"][0]['preview_url']
+
         
     
