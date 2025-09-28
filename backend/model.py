@@ -2,8 +2,6 @@ from sklearn.neighbors import NearestNeighbors as nn
 import pandas as pd
 import numpy as np 
 import glob
-import IPython.display as ipt
-import librosa
 from annoy import AnnoyIndex
 import db
 
@@ -76,7 +74,7 @@ class Retreival:
                 "artist" : song["artist"],
                 "title" : song["title"]
             })
-            
+
         return liked
 
     def compute_centroid(self):

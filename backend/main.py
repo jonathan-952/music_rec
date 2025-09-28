@@ -8,14 +8,10 @@ from spotipy.oauth2 import SpotifyClientCredentials
 from dotenv import load_dotenv
 import os
 
-agent = ''
-retreival = ''
-sp = ''
-app = FastAPI()
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    global agent, retreival, sp
     load_dotenv()
     connect = db.connection()
     cur = connect.cursor()
@@ -36,18 +32,18 @@ async def lifespan(app: FastAPI):
 
     yield
 
+app = FastAPI(lifespan=lifespan)
 
-
-app.get('/recommend-song')
+@app.get('/recommend-song')
 async def recommend():
     # this should return the index of mp3 file, fetch from db and play on frontend
     return retreival.recommendation(agent, sp)
 
-app.post('/feedback')
+@app.post('/feedback')
 async def feedback(index, rating):
     retreival.handle_update(index, rating, agent)
 
-app.get('/liked-songs')
+@app.get('/liked-songs')
 async def get_liked_songs():
     return retreival.liked_songs()
     
