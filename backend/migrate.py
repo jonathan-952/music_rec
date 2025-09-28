@@ -6,7 +6,7 @@ from huggingface_hub import login
 import kagglehub
 from datasets import load_dataset, DatasetDict
 import glob, shutil
-
+import soundfile as sf
 
 
 def upload_csv():
@@ -48,37 +48,41 @@ def upload_csv():
     connect.close()
 
 
-def upload_mp3_files():
+def upload_mp3_files(sample_size=200):
     load_dotenv()
-
-    path = ""
     try:
         path = kagglehub.dataset_download("noahbadoa/fma-dataset-100k-music-wav-files")
     except Exception as e:
-        print("Error:", e)
+        print("Error downloading dataset:", e); return
 
-  
-    target_path = os.path.join(path, "fma_large")
+    all_mp3s = glob.glob(os.path.join(path, "fma_large", "**", "*.mp3"), recursive=True)
+    print("Found", len(all_mp3s), "mp3 files")
 
-    all_mp3s = glob.glob(os.path.join(target_path, "**", "*.mp3"), recursive=True)
+    subset_mp3s = all_mp3s[:sample_size]
+
     flat_dir = os.path.join(path, "flat_mp3s")
-    os.makedirs(flat_dir, exist_ok=True)
+    shutil.rmtree(flat_dir, ignore_errors=True)
+    os.makedirs(flat_dir)
 
-    for mp3 in all_mp3s:
-        shutil.copy(mp3, flat_dir) 
+    def is_valid_audio(f):
+        try:
+            with sf.SoundFile(f) as s: s.read(frames=1)
+            return True
+        except: return False
 
-    # files = glob.glob(path + r'\**\*.mp3', recursive = True)
-    try: 
-        dataset = load_dataset("audiofolder", data_dir=target_path)
+    for f in subset_mp3s:
+        if is_valid_audio(f):
+            shutil.copy(f, flat_dir)
 
-        dataset_small = dataset["train"].select(range(10))
-        print(len(dataset_small))
+    try:
+        dataset = load_dataset("audiofolder", data_dir=flat_dir, split="train", drop_labels=True)
+        dataset_small = dataset.select(range(min(10, len(dataset))))
         login(token=os.getenv("HF_TOKEN"))
         dataset_small.push_to_hub("johnpork12345/music")
     except Exception as e:
-        print(e)
+        print("Error during dataset processing:", e)
     else:
-        print('successful')
+        print("Upload successful")
     
 upload_mp3_files()
 
