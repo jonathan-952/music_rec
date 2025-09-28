@@ -6,9 +6,10 @@ import { AudioPlayer } from "@/components/audioPlayer"
 import { Sidebar } from "@/components/likedSongs"
 import axios from "axios"
 import { useEffect } from "react"
+import {Song} from '@/components/audioPlayer'
 
 export default function LandingPage() {
-  const [song, setSong] = useState(null);
+  const [song, setSong] = useState<Song | null>(null);
   const [likedSongs, setLikedSongs] = useState([])
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [reroll, setReroll] = useState(0)
@@ -18,7 +19,7 @@ export default function LandingPage() {
     const fetchSong = async () => {
       try {
         const res = await axios.get("http://localhost:8000/recommend-song");
-        const liked = await axios.get("http://localhost:8000/recommend-song");
+        const liked = await axios.get("http://localhost:8000/liked-songs");
         setSong(res.data); // backend returns payload (metadata, index, etc)
         
       } catch (err) {
@@ -27,7 +28,7 @@ export default function LandingPage() {
     };
 
       fetchSong()
-    }, [setReroll]);
+    }, [reroll]);
 
     // add event listeners here so that whenever user likes/dislikes, fetch another song
 
@@ -36,7 +37,7 @@ export default function LandingPage() {
       try {
       await axios.post(`http://localhost:8000/feedback`, {
         rating: rating, 
-        song: song.index,
+        song: song!.index,
       });
       setReroll(prev => prev + 1);
 
@@ -58,7 +59,7 @@ export default function LandingPage() {
 
       <div className="flex-1 flex items-center justify-center px-6">
         <div className="w-full max-w-md space-y-6">
-          <AudioPlayer song={song}/>
+          {song && <AudioPlayer song={song} />}
           <div className="flex justify-center">
             <button
               onClick={() => handleFeedback(1)}

@@ -1,57 +1,46 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Play, Pause, SkipForward } from "lucide-react"
+import { Play, Pause } from "lucide-react"
 
-interface Song {
+export interface Song {
   index: number
   title: string
   artist: string
+  audio: string
 }
 
 interface AudioPlayerProps {
   song: Song
-  onEnded: () => void
-  onSkip: () => void
-  onRate: (rating: number) => void
 }
 
-export function AudioPlayer({ song, onEnded, onSkip }: AudioPlayerProps) {
+export function AudioPlayer({song}: AudioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false)
+  const [progress, setProgress] = useState(0)
   const audioRef = useRef<HTMLAudioElement>(null)
 
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
 
-    const handleEnded = () => {
-      setIsPlaying(false)
-      onEnded()
+
+    const handleTimeUpdate = () => {
+      if (audio.duration) {
+        setProgress((audio.currentTime / audio.duration) * 100)
+      }
     }
 
-    const handleLoadedMetadata = () => {
-     
-    }
-
-    audio.addEventListener("ended", handleEnded)
-    audio.addEventListener("loadedmetadata", handleLoadedMetadata)
+    audio.addEventListener("timeupdate", handleTimeUpdate)
 
     audio
       .play()
-      .then(() => {
-        setIsPlaying(true)
-      })
-      .catch(() => {
-        // Auto-play failed, user needs to interact first
-        setIsPlaying(false)
-      })
+      .then(() => setIsPlaying(true))
+      .catch(() => setIsPlaying(false))
 
     return () => {
-      audio.removeEventListener("ended", handleEnded)
       audio.removeEventListener("timeupdate", handleTimeUpdate)
-      audio.removeEventListener("loadedmetadata", handleLoadedMetadata)
     }
-  }, [song.index, onEnded])
+  }, [song.index])
 
   const togglePlayPause = () => {
     const audio = audioRef.current
@@ -70,21 +59,20 @@ export function AudioPlayer({ song, onEnded, onSkip }: AudioPlayerProps) {
       <div className="space-y-6">
         {/* Song Info */}
         <div className="text-center space-y-3">
-          <h2 className="text-2xl font-bold text-white text-balance">{song.title}</h2>
-          <div className="space-y-1">
-            <p className="text-zinc-300 text-lg">{song.artist}</p>
-          </div>
+          <h2 className="text-2xl font-bold text-white">{song.title}</h2>
+          <p className="text-zinc-300 text-lg">{song.artist}</p>
         </div>
 
-        <div className="space-y-2">
-          <div className="w-full bg-zinc-800 rounded-full h-1">
-            <div
-              className="bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 h-1 rounded-full transition-all duration-300"
-            />
-          </div>
+        {/* Progress Bar */}
+        <div className="w-full bg-zinc-800 rounded-full h-1">
+          <div
+            className="bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 h-1 rounded-full transition-all duration-300"
+            style={{ width: `${progress}%` }}
+          />
         </div>
 
-        <div className="flex items-center justify-center gap-4">
+        {/* Play/Pause */}
+        <div className="flex items-center justify-center">
           <button
             onClick={togglePlayPause}
             className="rounded-full w-16 h-16 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:scale-105 transition-transform shadow-lg flex items-center justify-center"
@@ -93,7 +81,7 @@ export function AudioPlayer({ song, onEnded, onSkip }: AudioPlayerProps) {
           </button>
         </div>
 
-        {/* Hidden Audio Element */}
+        {/* Hidden Audio */}
         <audio ref={audioRef} src={song.audio} preload="metadata" />
       </div>
     </div>

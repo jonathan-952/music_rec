@@ -2,10 +2,9 @@ from sklearn.neighbors import NearestNeighbors as nn
 import pandas as pd
 import numpy as np 
 import glob
-import IPython.display as ipt
-import librosa
 from annoy import AnnoyIndex
 import db
+
 
 
 class ThompsonSampling:
@@ -48,14 +47,14 @@ class ThompsonSampling:
 
 
 class Retreival:
-    def __init__(self, metadata, context_df, mp3_files):
+    def __init__(self, metadata, context_df):
         self.context_df = context_df
         self.metadata = metadata
         self.annoy = self.start_annoy()
         self.feedback = {}
         self.mp3_files = db.get_mp3()
     
-    async def start_annoy(self, context_df):
+    def start_annoy(self, context_df):
         t = AnnoyIndex(7, 'angular')
         for i in range(len(self.context_df.to_numpy())):
             v = context_df.iloc[i]
@@ -65,13 +64,25 @@ class Retreival:
         u = t
 
         return u
+    
+    def liked_songs(self):
+        liked = []
 
-    def compute_centroid(self, feedback):
-        if not feedback:
+        for index in self.feedback.values():
+            song = self.metadata.iloc[index]
+            liked.append({
+                "artist" : song["artist"],
+                "title" : song["title"]
+            })
+
+        return liked
+
+    def compute_centroid(self):
+        if not self.feedback:
             return None  # no feedback yet
         
-        indices = list(feedback.keys())
-        weights = np.array(list(feedback.values()))
+        indices = list(self.feedback.keys())
+        weights = np.array(list(self.feedback.values()))
         
         mask = weights != 0  # ignore skips
         embeddings = self.context_df.iloc[indices].to_numpy()
@@ -81,8 +92,8 @@ class Retreival:
         
         return numerator / denominator if denominator > 0 else None
 
-    def recommendation(self, agent):
-        centroid = self.compute_centroid(self.context_df, self.feedback)
+    def recommendation(self, agent, sp):
+        centroid = self.compute_centroid()
 
         if centroid is None:
             # fallback: random seed if no feedback yet
@@ -98,17 +109,15 @@ class Retreival:
 
         
         global_index = annoy_indices[rec_song_index]
-        audio_file_index = self.metadata.iloc[global_index, 12]
-        title = self.metadata.iloc[global_index, 'title']
-        artist = self.metadata.iloc[global_index, 'artist']
-        # call HF API eventually
-        rec_audio = self.mp3_files[audio_file_index]
+        # audio_file_index = self.metadata.iloc[global_index, 12]
+        title = self.metadata.loc[global_index, 'title']
+        artist = self.metadata.loc[global_index, 'artist']
+ 
+        query = f"{title} {artist}"
+        rec_audio = self.get_audio(query, sp)
 
         return {'index': global_index, 'audio': rec_audio, 'artist': artist, 'title': title}
         
-
-        # send mp3 file as response, along with global index to store on fe before sending back to be to update
-
         
     # logic to get feedback from user and update
     def handle_update(self, index, reward, agent):
@@ -117,5 +126,10 @@ class Retreival:
         context_vector = self.context_df.iloc[index].to_numpy()
         
         agent.update(context_vector, reward, index)
+    
+    def get_audio(self, query, sp):
+        res = sp.search(q=query, type="track", limit=1)
+        return res["tracks"]["items"][0]['preview_url']
+
         
     
