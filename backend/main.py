@@ -7,6 +7,14 @@ import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 from dotenv import load_dotenv
 import os
+from fastapi.middleware.cors import CORSMiddleware
+
+
+origins = [
+        "http://localhost:3000",  # Example: your frontend development server
+        "https://your-frontend-domain.com", # Example: your deployed frontend
+        # You can add more origins as needed
+    ]
 
 
 @asynccontextmanager
@@ -17,13 +25,13 @@ async def lifespan(app: FastAPI):
     cur = connect.cursor()
 
 
-    df = pd.DataFrame(db.get_all())
+    df = pd.DataFrame(db.get_all(cur))
     context_df = df.drop(columns = df.columns[[0, 8, 9, 10, 11, 12]])
 
-    mp3_files = db.get_mp3()
+    # mp3_files = db.get_mp3()
 
     agent = model.ThompsonSampling(7)
-    retreival = model.Retreival(df, context_df, mp3_files)
+    retreival = model.Retreival(df, context_df)
 
     sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
     client_id= os.getenv("CLIENT_ID"),
@@ -33,6 +41,14 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,  # Allow cookies to be sent with requests
+        allow_methods=["*"],     # Allow all HTTP methods (GET, POST, PUT, DELETE, etc.)
+        allow_headers=["*"],     # Allow all headers
+    )
 
 @app.get('/recommend-song')
 async def recommend():
