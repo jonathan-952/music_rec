@@ -117,6 +117,7 @@ class Retreival:
  
         query = f"{title} {artist}"
         rec_audio = self.get_audio(query, sp)
+        print(rec_audio)
 
         return {'index': global_index, 'audio': rec_audio, 'artist': artist, 'title': title}
         
