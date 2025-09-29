@@ -15,9 +15,9 @@ def connection():
     pwd = os.getenv("DB_PASSWORD")
 
     connection = psycopg2.connect(
-        host = "localhost",
-        database = "postgres",
-        port=15432, 
+        host = "db-music.cy9gckmqm7nz.us-east-1.rds.amazonaws.com",
+        database = "db-music",
+        port=5432, 
         user = username,
         password = pwd
     )
@@ -31,8 +31,7 @@ def get_all(cur):
 
     data = cur.fetchall()
     return data
-    
-    return df
+
 
 def get_mp3():
     path = ""
