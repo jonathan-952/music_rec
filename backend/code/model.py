@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np 
 import glob
 from annoy import AnnoyIndex
-import backend.code.db as db
+import db
 
 
 

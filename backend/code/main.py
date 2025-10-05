@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-import backend.code.model as model
-import backend.code.db as db
+import model
+import db
 import pandas as pd
 from contextlib import asynccontextmanager
 import spotipy
