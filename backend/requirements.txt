@@ -38,7 +38,7 @@ numpy==2.3.3
 packaging==25.0
 pandas==2.3.2
 propcache==0.3.2
-psycopg2==2.9.10
+psycopg2-binary==2.9.10
 pyarrow==21.0.0
 pydantic==2.11.9
 pydantic_core==2.33.2
