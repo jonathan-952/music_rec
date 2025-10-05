@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np 
 import glob
 from annoy import AnnoyIndex
-import db
+import backend.code.db as db
 
 
 
@@ -52,7 +52,6 @@ class Retreival:
         self.metadata = metadata
         self.annoy = self.start_annoy(context_df)
         self.feedback = {}
-        self.mp3_files = db.get_mp3()
     
     def start_annoy(self, context_df):
         t = AnnoyIndex(7, 'angular')
@@ -132,6 +131,7 @@ class Retreival:
     
     def get_audio(self, query, sp):
         res = sp.search(q=query, type="track", limit=1)
+        print(res["tracks"]["items"][0])
         return res["tracks"]["items"][0]['preview_url']
 
         

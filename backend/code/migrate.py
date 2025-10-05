@@ -1,7 +1,7 @@
 import csv
 import os
 from dotenv import load_dotenv
-import db
+import backend.code.db as db
 from huggingface_hub import login
 import kagglehub
 from datasets import load_dataset, DatasetDict

@@ -14,15 +14,20 @@ def connection():
     username = os.getenv("DB_USERNAME")
     pwd = os.getenv("DB_PASSWORD")
 
-    connection = psycopg2.connect(
-        host = "db-music.cy9gckmqm7nz.us-east-1.rds.amazonaws.com",
-        database = "db-music",
-        port=5432, 
-        user = username,
-        password = pwd
-    )
+    try: 
+        connection = psycopg2.connect(
+            host = "db-music.cy9gckmqm7nz.us-east-1.rds.amazonaws.com",
+            database = "postgres",
+            port=5432, 
+            user = username,
+            password = pwd
+        )
+        return connection
+    except Exception as e:
+        print("Database connection failed:", e)
+        raise
 
-    return connection
+    
 
 def get_all(cur):
     cur.execute("""
@@ -31,7 +36,8 @@ def get_all(cur):
 
     data = cur.fetchall()
     return data
-
+    
+    return df
 
 def get_mp3():
     path = ""

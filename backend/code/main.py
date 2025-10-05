@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-import model
-import db
+import backend.code.model as model
+import backend.code.db as db
 import pandas as pd
 from contextlib import asynccontextmanager
 import spotipy
@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 origins = [
         "http://localhost:3000",  # Example: your frontend development server
-        "https://your-frontend-domain.com", # Example: your deployed frontend
+        # Example: your deployed frontend
         # You can add more origins as needed
     ]
 
@@ -28,7 +28,6 @@ async def lifespan(app: FastAPI):
     df = pd.DataFrame(db.get_all(cur))
     context_df = df.drop(columns = df.columns[[0, 8, 9, 10, 11, 12]])
 
-    # mp3_files = db.get_mp3()
 
     agent = model.ThompsonSampling(7)
     retreival = model.Retreival(df, context_df)

@@ -1,0 +1,6 @@
+.env
+kaggle
+testing/data
+venv
+__pycache__/
+.cache
