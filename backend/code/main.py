@@ -8,7 +8,11 @@ from spotipy.oauth2 import SpotifyClientCredentials
 from dotenv import load_dotenv
 import os
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
+class FeedbackModel(BaseModel):
+    rating: int
+    index: int
 
 origins = [
         "http://localhost:3000",  # Example: your frontend development server
@@ -55,8 +59,8 @@ async def recommend():
     return retreival.recommendation(agent, sp)
 
 @app.post('/feedback')
-async def feedback(index, rating):
-    retreival.handle_update(index, rating, agent)
+async def feedback(req: FeedbackModel):
+    retreival.handle_update(req.index, req.rating, agent)
 
 @app.get('/liked-songs')
 async def get_liked_songs():

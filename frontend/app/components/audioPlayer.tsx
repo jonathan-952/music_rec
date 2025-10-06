@@ -31,11 +31,8 @@ export function AudioPlayer({song}: AudioPlayerProps) {
     }
 
     audio.addEventListener("timeupdate", handleTimeUpdate)
-
-    audio
-      .play()
-      .then(() => setIsPlaying(true))
-      .catch(() => setIsPlaying(false))
+    setIsPlaying(false)
+    audio.currentTime = 0
 
     return () => {
       audio.removeEventListener("timeupdate", handleTimeUpdate)
@@ -48,10 +45,14 @@ export function AudioPlayer({song}: AudioPlayerProps) {
 
     if (isPlaying) {
       audio.pause()
+      setIsPlaying(false)
     } else {
       audio.play()
+      .then(() => setIsPlaying(true))
+      .catch(err => console.error("Playback failed:", err))
+
     }
-    setIsPlaying(!isPlaying)
+    
   }
 
   return (

@@ -34,7 +34,7 @@ class ThompsonSampling:
         return np.argmax(scores)
 
     def update(self, rec_vector, reward, seen_song):
-
+        # need to pass in rec_vector
         rec_vector = rec_vector.reshape(1, -1)
 
         sigma_inv = np.linalg.inv(self.sigma)
@@ -99,12 +99,14 @@ class Retreival:
             # fallback: random seed if no feedback yet
             centroid = self.context_df.sample(1).to_numpy().flatten()
         
-        annoy_indices = self.annoy.get_nns_by_vector(centroid, 5, search_k=len(self.context_df))
+        annoy_indices = self.annoy.get_nns_by_vector(centroid, 50, search_k=len(self.context_df))
 
         candidates = self.context_df.iloc[annoy_indices]
         # full metadata df
         df_2 = self.metadata.iloc[annoy_indices]
         # map indices to embeddings in context df
+
+        # keep rerolling if song preview is unavailable
         rec_song_index = agent.select_arm(candidates.to_numpy(), annoy_indices)
 
         
@@ -116,7 +118,6 @@ class Retreival:
  
         query = f"{title} {artist}"
         rec_audio = self.get_audio(query, sp)
-        print(rec_audio)
 
         return {'index': global_index, 'audio': rec_audio, 'artist': artist, 'title': title}
         
@@ -130,9 +131,13 @@ class Retreival:
         agent.update(context_vector, reward, index)
     
     def get_audio(self, query, sp):
-        res = sp.search(q=query, type="track", limit=1)
-        print(res["tracks"]["items"][0])
-        return res["tracks"]["items"][0]['preview_url']
+        res = sp.search(q=query, type="track", limit=10)
+
+        for track in res["tracks"]["items"]:
+            if track["preview_url"]:
+                return track["preview_url"]
+        
+        return None
 
         
     

@@ -18,9 +18,11 @@ export default function LandingPage() {
    useEffect(() => {
     const fetchSong = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/recommend-song");
-        const liked = await axios.get("http://localhost:8000/liked-songs");
+        const res = await axios.get("http://54.90.150.96:8000/recommend-song");
+        const liked = await axios.get("http://54.90.150.96:8000/liked-songs");
         setSong(res.data); // backend returns payload (metadata, index, etc)
+        console.log(res.data)
+        setLikedSongs(liked.data)
         
       } catch (err) {
         console.error("Error fetching song:", err);
@@ -35,7 +37,7 @@ export default function LandingPage() {
 
   const handleFeedback = async (rating: number) => {
       try {
-      await axios.post(`http://localhost:8000/feedback`, {
+      await axios.post(`http://54.90.150.96:8000/feedback`, {
         rating: rating, 
         song: song!.index,
       });
