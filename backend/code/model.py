@@ -71,6 +71,7 @@ class Retreival:
         for index in self.feedback.values():
             song = self.metadata.iloc[index]
             liked.append({
+                "id": int(index),
                 "artist" : song[9],
                 "title" : song[8]
             })
