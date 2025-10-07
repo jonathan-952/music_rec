@@ -26,7 +26,7 @@ class ThompsonSampling:
 
         if self.seen:
             # create boolean mask of seen indices
-            mask = np.array([g in self.seen for g in annoy])
+            mask = np.isin(annoy, list(self.seen))
             # np fancy indexing
             scores[mask] = -np.inf
 
