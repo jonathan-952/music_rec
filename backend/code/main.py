@@ -9,6 +9,8 @@ from dotenv import load_dotenv
 import os
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from googleapiclient.discovery import build
+
 
 class FeedbackModel(BaseModel):
     rating: int
@@ -23,7 +25,7 @@ origins = [
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global agent, retreival, sp
+    global agent, retreival, yt
     load_dotenv()
     connect = db.connection()
     cur = connect.cursor()
@@ -36,10 +38,13 @@ async def lifespan(app: FastAPI):
     agent = model.ThompsonSampling(7)
     retreival = model.Retreival(df, context_df)
 
-    sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
-    client_id= os.getenv("CLIENT_ID"),
-    client_secret= os.getenv("CLIENT_SECRET")
-    ))
+    # sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
+    # client_id= os.getenv("CLIENT_ID"),
+    # client_secret= os.getenv("CLIENT_SECRET")
+    # ))
+ 
+    yt_key = os.getenv("YT_KEY")
+    yt = build("youtube", "v3", developerKey=yt_key)
 
     yield
 
@@ -56,7 +61,7 @@ app.add_middleware(
 @app.get('/recommend-song')
 async def recommend():
     # this should return the index of mp3 file, fetch from db and play on frontend
-    return retreival.recommendation(agent, sp)
+    return retreival.recommendation(agent, yt)
 
 @app.post('/feedback')
 async def feedback(req: FeedbackModel):

@@ -132,14 +132,21 @@ class Retreival:
         
         agent.update(context_vector, reward, index)
     
-    def get_audio(self, query, sp):
-        res = sp.search(q=query, type="track", limit=10)
+    def get_audio(self, query, yt):
+        request = yt.search().list(
+            part="snippet",
+            q= query,
+            type="video",
+            maxResults=5
+        )
+        response = request.execute()
 
-        for track in res["tracks"]["items"]:
-            if track["preview_url"]:
-                return track["preview_url"]
-        
-        return None
+        for item in response["items"]:
+            video_id = item["id"]["videoId"]
+            url = f"https://www.youtube.com/watch?v={video_id}"
+
+            if video_id:
+                return url
 
         
     
