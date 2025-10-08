@@ -98,31 +98,47 @@ class Retreival:
         centroid = self.compute_centroid()
 
         if centroid is None:
-            # fallback: random seed if no feedback yet
             centroid = self.context_df.sample(1).to_numpy().flatten()
         
         annoy_indices = self.annoy.get_nns_by_vector(centroid, 50, search_k=len(self.context_df))
-
         candidates = self.context_df.iloc[annoy_indices]
-        # full metadata df
         df_2 = self.metadata.iloc[annoy_indices]
-        # map indices to embeddings in context df
 
-        # keep rerolling if song preview is unavailable
-        rec_song_index = agent.select_arm(candidates.to_numpy(), annoy_indices)
+        tried = set()
+        rec_audio = None
+        rec_song_index = None
+        global_index = None
 
-        
-        global_index = annoy_indices[rec_song_index]
-        # audio_file_index = self.metadata.iloc[global_index, 12]
-        
-        title = self.metadata.loc[global_index, 8]
-        artist = self.metadata.loc[global_index, 9]
- 
-        query = f"{title} {artist}"
-        rec_audio = self.get_audio(query, sp)
+        for _ in range(len(annoy_indices)):
+            rec_song_index = agent.select_arm(candidates.to_numpy(), annoy_indices)
+            global_index = annoy_indices[rec_song_index]
 
-        return {'index': global_index, 'audio': rec_audio, 'artist': artist, 'title': title}
-        
+            title = self.metadata.loc[global_index, 8]
+            artist = self.metadata.loc[global_index, 9]
+            query = f"{title} {artist}"
+
+            rec_audio = self.get_audio(query, sp)
+
+            if rec_audio:
+                break
+
+            tried.add(global_index)
+
+            # remove tried index from candidates and annoy_indices
+            mask = ~candidates.index.isin(tried)
+            candidates = candidates[mask]
+            annoy_indices = annoy_indices[mask]
+
+            if candidates.empty:
+                rec_audio = 'https://www.youtube.com/watch?v=BIkUPiXVB18'
+                break
+
+        return {
+            "index": int(global_index),
+            "title": title,
+            "artist": artist,
+            "audio": rec_audio
+        }  
         
     # logic to get feedback from user and update
     def handle_update(self, index, reward, agent):
@@ -147,6 +163,10 @@ class Retreival:
 
             if video_id:
                 return url
+        
+        return None
+        
+
 
         
     
