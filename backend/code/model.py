@@ -153,7 +153,9 @@ class Retreival:
             part="snippet",
             q= query,
             type="video",
-            maxResults=5
+            maxResults=3,
+            order="relevance",
+            videoCategoryId="10",
         )
         response = request.execute()
 
