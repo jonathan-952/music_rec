@@ -117,8 +117,11 @@ class Retreival:
             artist = self.metadata.loc[global_index, 9]
             query = f"{title} {artist}"
 
-            rec_audio = self.get_audio(query, sp)
-
+            try: 
+                rec_audio = self.get_audio(query, sp)
+            except Exception:
+                rec_audio = 'https://www.youtube.com/watch?v=BIkUPiXVB18'
+                    
             if rec_audio:
                 break
 
