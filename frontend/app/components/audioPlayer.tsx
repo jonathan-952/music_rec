@@ -14,76 +14,33 @@ interface AudioPlayerProps {
   song: Song
 }
 
-export function AudioPlayer({song}: AudioPlayerProps) {
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const audioRef = useRef<HTMLAudioElement>(null)
-
-  useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) return
-
-
-    const handleTimeUpdate = () => {
-      if (audio.duration) {
-        setProgress((audio.currentTime / audio.duration) * 100)
-      }
-    }
-
-    audio.addEventListener("timeupdate", handleTimeUpdate)
-    setIsPlaying(false)
-    audio.currentTime = 0
-
-    return () => {
-      audio.removeEventListener("timeupdate", handleTimeUpdate)
-    }
-  }, [song.index])
-
-  const togglePlayPause = () => {
-    const audio = audioRef.current
-    if (!audio) return
-
-    if (isPlaying) {
-      audio.pause()
-      setIsPlaying(false)
-    } else {
-      audio.play()
-      .then(() => setIsPlaying(true))
-      .catch(err => console.error("Playback failed:", err))
-
-    }
-    
-  }
+export function AudioPlayer({ song }: AudioPlayerProps) {
+  // Extract YouTube video ID (e.g. from https://www.youtube.com/watch?v=8779P4rim80)
+  const videoIdMatch = song.audio.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/)
+  const videoId = videoIdMatch ? videoIdMatch[1] : null
 
   return (
     <div className="bg-zinc-900 rounded-2xl p-8 border border-zinc-800 shadow-2xl max-w-md mx-auto">
-      <div className="space-y-6">
+      <div className="space-y-6 text-center">
         {/* Song Info */}
-        <div className="text-center space-y-3">
-          <h2 className="text-2xl font-bold text-white">{song.title}</h2>
-          <p className="text-zinc-300 text-lg">{song.artist}</p>
-        </div>
+        <h2 className="text-2xl font-bold text-white">{song.title}</h2>
+        <p className="text-zinc-300 text-sm">{song.artist}</p>
 
-        {/* Progress Bar */}
-        <div className="w-full bg-zinc-800 rounded-full h-1">
-          <div
-            className="bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 h-1 rounded-full transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-
-        {/* Play/Pause */}
-        <div className="flex items-center justify-center">
-          <button
-            onClick={togglePlayPause}
-            className="rounded-full w-16 h-16 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:scale-105 transition-transform shadow-lg flex items-center justify-center"
-          >
-            {isPlaying ? <Pause className="w-6 h-6 text-white" /> : <Play className="w-6 h-6 ml-1 text-white" />}
-          </button>
-        </div>
-
-        {/* Hidden Audio */}
-        <audio ref={audioRef} src={song.audio} preload="metadata" />
+        {/* YouTube Player */}
+        {videoId ? (
+          <div className="aspect-video rounded-xl overflow-hidden shadow-lg">
+            <iframe
+              src={`https://www.youtube.com/embed/${videoId}?autoplay=0&modestbranding=1&rel=0`}
+              title={song.title}
+              width="100%"
+              height="100%"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        ) : (
+          <p className="text-zinc-400">Invalid YouTube URL</p>
+        )}
       </div>
     </div>
   )

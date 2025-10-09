@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Heart } from "lucide-react"
+import { Heart, Check, X} from "lucide-react"
 import { AudioPlayer } from "@/components/audioPlayer"
 import { Sidebar } from "@/components/likedSongs"
 import axios from "axios"
@@ -18,10 +18,9 @@ export default function LandingPage() {
    useEffect(() => {
     const fetchSong = async () => {
       try {
-        const res = await axios.get("http://54.90.150.96:8000/recommend-song");
-        const liked = await axios.get("http://54.90.150.96:8000/liked-songs");
+        const res = await axios.get("http://184.72.148.78:8000/recommend-song");
+        const liked = await axios.get("http://184.72.148.78:8000/liked-songs");
         setSong(res.data); // backend returns payload (metadata, index, etc)
-        console.log(res.data)
         setLikedSongs(liked.data)
         
       } catch (err) {
@@ -37,9 +36,9 @@ export default function LandingPage() {
 
   const handleFeedback = async (rating: number) => {
       try {
-      await axios.post(`http://54.90.150.96:8000/feedback`, {
+      await axios.post(`http://184.72.148.78:8000/feedback`, {
         rating: rating, 
-        song: song!.index,
+        index: song!.index,
       });
       setReroll(prev => prev + 1);
 
@@ -50,30 +49,30 @@ export default function LandingPage() {
 
   return (
     <main className="min-h-screen bg-black flex flex-col">
-      <div className="flex justify-end p-6">
+      <div className="flex justify-end p-7">
         <button
           onClick={() => setIsSidebarOpen(true)}
-          className="p-3 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:scale-105 transition-transform"
+          className="p-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 hover:scale-105 hover:cursor-pointer transition-transform"
         >
-          <Heart className="w-5 h-5 text-white" />
+          <Heart className="w-6 h-6 text-white" />
         </button>
       </div>
 
       <div className="flex-1 flex items-center justify-center px-6">
         <div className="w-full max-w-md space-y-6">
           {song && <AudioPlayer song={song} />}
-          <div className="flex justify-center">
+          <div className="flex justify-center gap-20">
             <button
               onClick={() => handleFeedback(1)}
-              className="px-6 py-3 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:scale-105 transition-transform text-white font-medium"
+              className="flex justify-center px-6 py-3 w-25 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 hover:scale-105 hover:cursor-pointer transition-transform text-white font-medium"
             >
-              Like
+              <Check size={28} strokeWidth={2.5} />
             </button>
             <button
               onClick={() => handleFeedback(-1)}
-              className="px-6 py-3 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:scale-105 transition-transform text-white font-medium"
+              className="flex justify-center px-6 py-3 w-25 rounded-full bg-gradient-to-r from-purple-500  to-blue-500 hover:scale-105 hover:cursor-pointer transition-transform text-white font-medium"
             >
-              Dislike
+               <X size={28} strokeWidth={2.5} />
             </button>
           </div>
         </div>

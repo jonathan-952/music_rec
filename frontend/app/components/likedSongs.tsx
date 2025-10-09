@@ -2,14 +2,12 @@
 
 import { X } from "lucide-react"
 import { useEffect } from "react"
-import axios from "axios"
+import Link from 'next/link';
 
 interface Song {
   id: number
   title: string
   artist: string
-  album: string
-  duration: string
   coverUrl: string
   audioUrl: string
 }
@@ -32,8 +30,8 @@ export function Sidebar({ isOpen, onClose, likedSongs }: SidebarProps) {
       <div className="w-80 bg-zinc-900 border-l border-zinc-800 p-6 overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-bold text-white">Liked Songs</h2>
-          <button onClick={onClose} className="p-2 hover:bg-zinc-800 rounded-lg transition-colors">
-            <X className="w-4 h-4 text-zinc-400" />
+          <button onClick={onClose} className="p-2 hover:bg-zinc-800  rounded-lg transition-colors">
+            <X className="w-4 h-4 text-zinc-400 hover:cursor-pointer" />
           </button>
         </div>
 
@@ -45,9 +43,8 @@ export function Sidebar({ isOpen, onClose, likedSongs }: SidebarProps) {
               <div key={song.id} className="p-3 bg-zinc-800/50 rounded-lg">
                 <h3 className="font-medium text-sm text-white">{song.title}</h3>
                 <p className="text-xs text-zinc-400">
-                  {song.artist} • {song.album}
+                  {song.artist}
                 </p>
-                <p className="text-xs text-zinc-400 mt-1">{song.duration}</p>
               </div>
             ))}
           </div>
