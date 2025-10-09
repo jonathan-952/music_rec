@@ -127,7 +127,7 @@ class Retreival:
             # remove tried index from candidates and annoy_indices
             mask = ~candidates.index.isin(tried)
             candidates = candidates[mask]
-            annoy_indices = annoy_indices[mask]
+            annoy_indices = np.array(annoy_indices)[mask.to_numpy()]
 
             if candidates.empty:
                 rec_audio = 'https://www.youtube.com/watch?v=BIkUPiXVB18'
