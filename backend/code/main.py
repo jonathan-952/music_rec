@@ -17,9 +17,8 @@ class FeedbackModel(BaseModel):
     index: int
 
 origins = [
-        "http://localhost:3000",  # Example: your frontend development server
-        # Example: your deployed frontend
-        # You can add more origins as needed
+        "http://localhost:3000",  
+        'https://music-rec-eta.vercel.app/',
     ]
 
 
